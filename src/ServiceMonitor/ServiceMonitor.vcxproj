@@ -1,11 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props" Condition="Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props')" />
-  <ItemGroup Condition=" '$(SignType)' != ''">
-    <FilesToSign Include="$(FilesToSign);$(OutDir)\$(TargetFileName)">
-      <Authenticode>$(SigningIdentity)</Authenticode>
-    </FilesToSign>
-  </ItemGroup>
+  <Import Project="$(ProjectDir)..\..\build\submodule.props" Condition="Exists('$(ProjectDir)..\..\build\submodule.props')" />
+  <Import Project="$(IIS-Common)build\versions.props" Condition="Exists('$(IIS-Common)build\versions.props')" />
+  <Import Project="$(IIS-Common)build\settings.props" Condition="Exists('$(IIS-Common)build\settings.props')" />
+  <Import Project="$(IIS-Common)build\sign.props" Condition="Exists('$(IIS-Common)build\sign.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -90,11 +88,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -104,11 +98,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -117,14 +107,10 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -135,14 +121,10 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -170,21 +152,24 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ServiceMonitor.rc">
-      <PreprocessorDefinitions  Condition=" '$(BuildMinorVersion)' != '' ">SM_BUILDMINORVERSION=$(BuildMinorVersion)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition=" '$(BuildMinorVersion)' != '' ">SM_BUILDMINORVERSION=$(BuildMinorVersion)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets" Condition="Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets')" />
-  </ImportGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+  <Target Name="EnsureImportsExist" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+      <ErrorText>This project is trying to import a missing file: {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props'))" />
-    <Error Condition="!Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets'))" />
+    <Error Condition="!Exists('$(ProjectDir)..\..\build\submodule.props')" Text="$([System.String]::Format('$(ErrorText)', '$(ProjectDir)..\..\build\submodule.props'))" />
+    <Error Condition="!Exists('$(IIS-Common)build\versions.props')" Text="$([System.String]::Format('$(ErrorText)', '$(IIS-Common)build\versions.props'))" />
+    <Error Condition="!Exists('$(IIS-Common)build\settings.props')" Text="$([System.String]::Format('$(ErrorText)', '$(IIS-Common)build\settings.props'))" />
+    <Error Condition="!Exists('$(IIS-Common)build\sign.props')" Text="$([System.String]::Format('$(ErrorText)', '$(IIS-Common)build\sign.props'))" />
+    <Error Condition="!Exists('$(IIS-Common)build\copy-outputs.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(IIS-Common)build\copy-outputs.targets'))" />
+    <Error Condition="!Exists('$(UserProfile)\.nuget\packages\microsoft.visualstudioeng.microbuild.core\$(MicroBuildVersion)\build\Microsoft.VisualStudioEng.MicroBuild.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(UserProfile)\.nuget\packages\microsoft.visualstudioeng.microbuild.core\$(MicroBuildVersion)\build\Microsoft.VisualStudioEng.MicroBuild.Core.targets'))" />
   </Target>
+  <Import Project="$(UserProfile)\.nuget\packages\microsoft.visualstudioeng.microbuild.core\$(MicroBuildVersion)\build\Microsoft.VisualStudioEng.MicroBuild.Core.targets" Condition="Exists('$(UserProfile)\.nuget\packages\microsoft.visualstudioeng.microbuild.core\$(MicroBuildVersion)\build\Microsoft.VisualStudioEng.MicroBuild.Core.targets')" />
+  <Import Project="$(IIS-Common)build\copy-outputs.targets" Condition="Exists('$(IIS-Common)build\copy-outputs.targets')" />
 </Project>
